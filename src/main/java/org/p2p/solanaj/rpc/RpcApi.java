@@ -2,7 +2,6 @@ package org.p2p.solanaj.rpc;
 
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
-import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.types.*;
 import org.p2p.solanaj.rpc.types.ConfigObjects.ConfirmedSignFAddr2;
 import org.p2p.solanaj.rpc.types.ConfigObjects.Filter;
@@ -26,11 +25,11 @@ public class RpcApi {
         return client.call("getRecentBlockhash", null, RecentBlockhash.class).getRecentBlockhash();
     }
 
-    public String sendTransaction(Transaction transaction, Account signer) throws RpcException {
+    public String sendTransaction(org.p2p.solanaj.core.Transaction transaction, Account signer) throws RpcException {
         return sendTransaction(transaction, Arrays.asList(signer));
     }
 
-    public String sendTransaction(Transaction transaction, List<Account> signers) throws RpcException {
+    public String sendTransaction(org.p2p.solanaj.core.Transaction transaction, List<Account> signers) throws RpcException {
         String recentBlockhash = getRecentBlockhash();
         transaction.setRecentBlockHash(recentBlockhash);
         transaction.sign(signers);
@@ -46,7 +45,7 @@ public class RpcApi {
         return client.call("sendTransaction", params, String.class);
     }
 
-    public void sendAndConfirmTransaction(Transaction transaction, List<Account> signers, NotificationEventListener listener) throws RpcException {
+    public void sendAndConfirmTransaction(org.p2p.solanaj.core.Transaction transaction, List<Account> signers, NotificationEventListener listener) throws RpcException {
         String signature = sendTransaction(transaction, signers);
 
         SubscriptionWebSocketClient subClient = SubscriptionWebSocketClient.getInstance(client.getEndpoint());
@@ -62,7 +61,7 @@ public class RpcApi {
     }
 
     @Deprecated
-    public ConfirmedTransaction getConfirmedTransaction(String signature) throws RpcException {
+    public Transaction getConfirmedTransaction(String signature) throws RpcException {
         List<Object> params = new ArrayList<Object>();
 
         params.add(signature);
@@ -70,7 +69,7 @@ public class RpcApi {
         // the default encoding is JSON
         // params.add("json");
 
-        return client.call("getConfirmedTransaction", params, ConfirmedTransaction.class);
+        return client.call("getConfirmedTransaction", params, Transaction.class);
     }
 
     @Deprecated
@@ -165,5 +164,13 @@ public class RpcApi {
 
         final SignatureInformation[] signatures = client.call("getSignaturesForAddress", params, SignatureInformation[].class);
         return Arrays.stream(signatures).toList();
+    }
+
+    public Transaction getTransaction(String signature) throws RpcException {
+        List<Object> params = new ArrayList<Object>();
+
+        params.add(signature);
+
+        return client.call("getTransaction", params, Transaction.class);
     }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.squareup.moshi.Json;
 
-public class ConfirmedTransaction {
+public class Transaction {
 
     public static class Header {
 
