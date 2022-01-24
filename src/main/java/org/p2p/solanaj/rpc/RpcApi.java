@@ -1,28 +1,22 @@
 package org.p2p.solanaj.rpc;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
-import org.p2p.solanaj.rpc.types.ConfigObjects.*;
-import org.p2p.solanaj.rpc.types.AccountInfo;
-import org.p2p.solanaj.rpc.types.ConfirmedTransaction;
-import org.p2p.solanaj.rpc.types.ProgramAccount;
-import org.p2p.solanaj.rpc.types.RecentBlockhash;
-import org.p2p.solanaj.rpc.types.RpcSendTransactionConfig;
-import org.p2p.solanaj.rpc.types.SignatureInformation;
+import org.p2p.solanaj.rpc.types.*;
+import org.p2p.solanaj.rpc.types.ConfigObjects.ConfirmedSignFAddr2;
+import org.p2p.solanaj.rpc.types.ConfigObjects.Filter;
+import org.p2p.solanaj.rpc.types.ConfigObjects.Memcmp;
+import org.p2p.solanaj.rpc.types.ConfigObjects.ProgramAccountConfig;
 import org.p2p.solanaj.rpc.types.RpcResultTypes.ValueLong;
 import org.p2p.solanaj.rpc.types.RpcSendTransactionConfig.Encoding;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 import org.p2p.solanaj.ws.listeners.NotificationEventListener;
 
+import java.util.*;
+
 public class RpcApi {
-    private RpcClient client;
+    private final RpcClient client;
 
     public RpcApi(RpcClient client) {
         this.client = client;
@@ -52,8 +46,7 @@ public class RpcApi {
         return client.call("sendTransaction", params, String.class);
     }
 
-    public void sendAndConfirmTransaction(Transaction transaction, List<Account> signers,
-            NotificationEventListener listener) throws RpcException {
+    public void sendAndConfirmTransaction(Transaction transaction, List<Account> signers, NotificationEventListener listener) throws RpcException {
         String signature = sendTransaction(transaction, signers);
 
         SubscriptionWebSocketClient subClient = SubscriptionWebSocketClient.getInstance(client.getEndpoint());
@@ -81,9 +74,8 @@ public class RpcApi {
     }
 
     @Deprecated
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<SignatureInformation> getConfirmedSignaturesForAddress2(PublicKey account, int limit)
-            throws RpcException {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<SignatureInformation> getConfirmedSignaturesForAddress2(PublicKey account, int limit) throws RpcException {
         List<Object> params = new ArrayList<Object>();
 
         params.add(account.toString());
@@ -111,9 +103,8 @@ public class RpcApi {
         return getProgramAccounts(account, new ProgramAccountConfig(Encoding.base64));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<ProgramAccount> getProgramAccounts(PublicKey account, ProgramAccountConfig programAccountConfig)
-            throws RpcException {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<ProgramAccount> getProgramAccounts(PublicKey account, ProgramAccountConfig programAccountConfig) throws RpcException {
         List<Object> params = new ArrayList<Object>();
 
         params.add(account.toString());
@@ -164,5 +155,15 @@ public class RpcApi {
         params.add(lamports);
 
         return client.call("requestAirdrop", params, String.class);
+    }
+
+    public List<SignatureInformation> getSignaturesForAddress(String address, String untilAddress) throws RpcException {
+        List<Object> params = new ArrayList<Object>();
+
+        params.add(address);
+        params.add(untilAddress);
+
+        final SignatureInformation[] signatures = client.call("getSignaturesForAddress", params, SignatureInformation[].class);
+        return Arrays.stream(signatures).toList();
     }
 }
