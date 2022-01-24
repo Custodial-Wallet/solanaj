@@ -133,7 +133,7 @@ public class Transaction {
 
     }
 
-    public static class Transaction {
+    public static class Tx {
 
         @Json(name = "message")
         private Message message;
@@ -155,7 +155,7 @@ public class Transaction {
     @Json(name = "slot")
     private long slot;
     @Json(name = "transaction")
-    private Transaction transaction;
+    private Tx transaction;
 
     public Meta getMeta() {
         return meta;
@@ -165,8 +165,7 @@ public class Transaction {
         return slot;
     }
 
-    public Transaction getTransaction() {
+    public Tx getTransaction() {
         return transaction;
     }
-
 }
