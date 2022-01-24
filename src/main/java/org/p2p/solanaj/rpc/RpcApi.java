@@ -68,6 +68,7 @@ public class RpcApi {
         return client.call("getBalance", params, ValueLong.class).getValue();
     }
 
+    @Deprecated
     public ConfirmedTransaction getConfirmedTransaction(String signature) throws RpcException {
         List<Object> params = new ArrayList<Object>();
 
@@ -79,6 +80,7 @@ public class RpcApi {
         return client.call("getConfirmedTransaction", params, ConfirmedTransaction.class);
     }
 
+    @Deprecated
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<SignatureInformation> getConfirmedSignaturesForAddress2(PublicKey account, int limit)
             throws RpcException {
@@ -163,5 +165,4 @@ public class RpcApi {
 
         return client.call("requestAirdrop", params, String.class);
     }
-
 }
